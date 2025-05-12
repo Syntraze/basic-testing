@@ -1,10 +1,9 @@
 import { generateLinkedList } from './index';
 
 describe('generateLinkedList', () => {
-  // Regular strict comparison test
   test('should generate linked list from values 1', () => {
-    const input = [1, 2, 3];
-    const expected = {
+    const result = generateLinkedList([1, 2, 3]);
+    expect(result).toStrictEqual({
       value: 1,
       next: {
         value: 2,
@@ -16,16 +15,11 @@ describe('generateLinkedList', () => {
           },
         },
       },
-    };
-
-    expect(generateLinkedList(input)).toStrictEqual(expected);
+    });
   });
 
-  // Snapshot-based test
   test('should generate linked list from values 2', () => {
-    const input = ['a', 'b', 'c'];
-    const list = generateLinkedList(input);
-
-    expect(list).toMatchSnapshot();
+    const result = generateLinkedList(['a', 'b']);
+    expect(result).toMatchSnapshot();
   });
 });
