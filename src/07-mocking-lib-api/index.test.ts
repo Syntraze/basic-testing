@@ -3,7 +3,7 @@ import { throttledGetDataFromApi } from './index';
 
 jest.mock('axios');
 jest.mock('lodash', () => ({
-  throttle: (fn: any) => fn, 
+  throttle: <T extends (...args: unknown[]) => unknown>(fn: T): T => fn,
 }));
 
 describe('throttledGetDataFromApi', () => {

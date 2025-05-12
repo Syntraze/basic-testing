@@ -2,7 +2,12 @@ import {
   getBankAccount,
   InsufficientFundsError,
   TransferFailedError,
+  SynchronizationFailedError,
 } from './index';
+
+type BankAccountWithMockableFetch = ReturnType<typeof getBankAccount> & {
+  fetchBalance: () => Promise<number | null>;
+};
 
 describe('BankAccount', () => {
   test('should create account with initial balance', () => {
@@ -10,7 +15,7 @@ describe('BankAccount', () => {
     expect(account.getBalance()).toBe(100);
   });
 
-  test('should throw InsufficientFundsError error when withdrawing more than balance', () => {
+  test('should throw InsufficientFundsError when withdrawing more than balance', () => {
     const account = getBankAccount(50);
     expect(() => account.withdraw(100)).toThrow(InsufficientFundsError);
   });
@@ -46,25 +51,25 @@ describe('BankAccount', () => {
     expect(to.getBalance()).toBe(80);
   });
 
-  test('fetchBalance should return number in case if request did not fail', async () => {
-    const a = getBankAccount(0);
-    jest.spyOn(a as any, 'fetchBalance').mockResolvedValue(42);
+  test('fetchBalance should return number if request did not fail', async () => {
+    const a = getBankAccount(0) as BankAccountWithMockableFetch;
+    jest.spyOn(a, 'fetchBalance').mockResolvedValue(42);
     const result = await a.fetchBalance();
     expect(result).toBe(42);
   });
 
   test('should set new balance if fetchBalance returned number', async () => {
-    const a = getBankAccount(0);
-    jest.spyOn(a as any, 'fetchBalance').mockResolvedValue(88);
+    const a = getBankAccount(0) as BankAccountWithMockableFetch;
+    jest.spyOn(a, 'fetchBalance').mockResolvedValue(88);
     await a.synchronizeBalance();
     expect(a.getBalance()).toBe(88);
   });
 
   test('should throw SynchronizationFailedError if fetchBalance returned null', async () => {
-    const account = getBankAccount(100);
-    jest.spyOn(account as any, 'fetchBalance').mockResolvedValue(null);
+    const account = getBankAccount(100) as BankAccountWithMockableFetch;
+    jest.spyOn(account, 'fetchBalance').mockResolvedValue(null);
     await expect(account.synchronizeBalance()).rejects.toThrow(
-      'Synchronization failed',
+      SynchronizationFailedError,
     );
   });
 });
